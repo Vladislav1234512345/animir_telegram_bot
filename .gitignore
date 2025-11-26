@@ -1,0 +1,18 @@
+.venv
+.idea
+static/*
+__pycache__/
+
+media/videos/*
+
+*.pyc
+*.pem
+*.json
+*.log
+
+# Ignore env files
+.env
+*.env
+.env.*
+!.env.example
+.DS_store
