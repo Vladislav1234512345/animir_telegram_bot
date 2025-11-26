@@ -15,8 +15,9 @@ from container import configure_logging, USER_TIMEZONE
 from database import AsyncSessionDep
 from functions import utc_to_user_time
 from models import Client
+from schemas import ClientCreate
 
-router = APIRouter(tags=['CLIENTS'])
+router = APIRouter(prefix="/clients", tags=['CLIENTS'])
 
 logger = logging.getLogger(__name__)
 configure_logging(level=logging_settings.logging_level)
@@ -24,11 +25,12 @@ configure_logging(level=logging_settings.logging_level)
 
 @router.post('/')
 async def create_client(
-        phone_number: str,
+        client_data: ClientCreate,
         request: Request,
         session: AsyncSessionDep
 ) -> JSONResponse:
-    phone_number_info = phonenumbers.parse(phone_number, None)
+    phone_number = client_data.phone_number
+    phone_number_info = phonenumbers.parse(phone_number, 'RU')
     if region_code_for_number(phone_number_info) != 'RU':
         logger.warning('Код региона номера телефона "%s" не российский!', phone_number)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -49,9 +51,9 @@ async def create_client(
         date, time = utc_to_user_time(utc_time=client.created_at, user_utc_offset=USER_TIMEZONE)
         bot = request.app.state.bot
         send_admin_text = (f"<b>🆔UID:</b> {client.id}"
-                           f"<b>☎️Телефон:</b> {client.phone_number}"
-                           f"<b>📅Дата:</b> {date}"
-                           f"<b>⏳Время:</b> {time}"
+                           f"\n<b>☎️Телефон:</b> {client.phone_number}"
+                           f"\n<b>📅Дата:</b> {date}"
+                           f"\n<b>⏳Время:</b> {time}"
                            )
         try:
             await bot.send_message(chat_id=web_settings.ADMIN_ID, text=send_admin_text, parse_mode='HTML')

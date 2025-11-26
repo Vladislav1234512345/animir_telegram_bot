@@ -34,6 +34,7 @@ class WebSettings(BaseSettings):
     ADMIN_ID: int
 
     WEBHOOK_URL: str
+    FRONTEND_URL: str
 
     WEBHOOK_PATH: str = "/webhook"
 
