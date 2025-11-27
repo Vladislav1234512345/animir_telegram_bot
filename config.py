@@ -59,18 +59,28 @@ class DatabaseSettings(BaseSettings):
 
     @property
     def POSTGRES_URL_psycopg(self):
+        password = (
+            self.POSTGRES_PASSWORD.get_secret_value()
+            if hasattr(self.POSTGRES_PASSWORD, "get_secret_value")
+            else self.POSTGRES_PASSWORD
+        )
         return (
             f"postgresql+psycopg://"
-            f"{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"{self.POSTGRES_USER}:{password}"
             f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}"
             f"/{self.POSTGRES_DB}"
         )
 
     @property
     def POSTGRES_URL_asyncpg(self):
+        password = (
+            self.POSTGRES_PASSWORD.get_secret_value()
+            if hasattr(self.POSTGRES_PASSWORD, "get_secret_value")
+            else self.POSTGRES_PASSWORD
+        )
         return (
             f"postgresql+asyncpg://"
-            f"{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"{self.POSTGRES_USER}:{password}"
             f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}"
             f"/{self.POSTGRES_DB}"
         )
